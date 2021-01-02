@@ -44,8 +44,6 @@ const float level = 0.8; // level to be trigged as water
  * @brief      Arduino setup function
  */
 
-
-
 void start_end() {
   digitalWrite(buzz, HIGH);;
   delay(500);
@@ -67,15 +65,11 @@ void routine_sound() {
     digitalWrite(buzz, LOW);
     start_end();
   }
-   
-
-
- 
+    
 void setup()
 {
     // put your setup code here, to run once:
     Serial.begin(115200);
-
     Serial.println("Edge Impulse Inferencing Demo");
 
     // summary of inferencing settings (from model_metadata.h)
@@ -139,18 +133,13 @@ void loop()
         Serial.println(Enzo_Str);
         Serial.println(Enzo_val);
         if((Enzo_Str==1) && (Enzo_val > level)) {
-          
            digitalWrite(LED_BUILTIN, HIGH);   // turn the LED on (HIGH is the voltage level)
            routine_sound();
-           
            }
            else {
-           
             digitalWrite(LED_BUILTIN, LOW);
-            
             }
         Serial.println("----------------");
-        
     }
 #if EI_CLASSIFIER_HAS_ANOMALY == 1
     ei_printf("    anomaly score: %.3f\n", result.anomaly);
