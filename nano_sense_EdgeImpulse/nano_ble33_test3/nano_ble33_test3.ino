@@ -38,7 +38,8 @@ typedef struct {
 static inference_t inference;
 static signed short sampleBuffer[2048];
 static bool debug_nn = false; // Set this to true to see e.g. features generated from the raw signal
-const int buzz =  2;       // the number of the LED pin
+const int buzz =  2;       // the number of the buzzer pin
+const int led = 3;         // the number of the external len pin
 const float level = 0.8; // level to be trigged as water 
 /**
  * @brief      Arduino setup function
@@ -84,6 +85,7 @@ void setup()
         return;
     }
     pinMode(LED_BUILTIN, OUTPUT);
+    pinMode(led, OUTPUT);
     pinMode(buzz, OUTPUT);
   
 }
@@ -133,11 +135,13 @@ void loop()
         Serial.println(Enzo_Str);
         Serial.println(Enzo_val);
         if((Enzo_Str==1) && (Enzo_val > level)) {
-           digitalWrite(LED_BUILTIN, HIGH);   // turn the LED on (HIGH is the voltage level)
+           digitalWrite(LED_BUILTIN, HIGH);   // turn the internal LED on (HIGH is the voltage level)
+           digitalWrite(led, HIGH);   // turn the LED on external LED (HIGH is the voltage level)
            routine_sound();
            }
            else {
             digitalWrite(LED_BUILTIN, LOW);
+            digitalWrite(led, LOW);
             }
         Serial.println("----------------");
     }
