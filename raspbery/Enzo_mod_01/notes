@@ -1,0 +1,1 @@
+python3 classify_picamera.py   --model ./enzo01_converted_model.tflite   --labels ./labels 
