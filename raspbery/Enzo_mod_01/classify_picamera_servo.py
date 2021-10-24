@@ -47,21 +47,21 @@ def classify_image(interpreter, image, top_k=1):
 
 def servo_ctrl(id=0):
     if (id==3):  #nothing
-        kit.servo[0].angle = 0
-        kit.servo[1].angle = 0
-        kit.servo[2].angle = 0
+        kit.servo[0].angle = 10
+        kit.servo[1].angle = 10
+        kit.servo[2].angle = 10
     elif (id ==2): # closed hand
-        kit.servo[0].angle = 0
-        kit.servo[1].angle = 0
+        kit.servo[0].angle = 10
+        kit.servo[1].angle = 10
         kit.servo[2].angle = 90
     elif (id ==1): #more than one finger
-        kit.servo[0].angle = 0
-        kit.servo[1].angle = 90
-        kit.servo[2].angle = 0
+        kit.servo[0].angle = 10
+        kit.servo[1].angle = 80
+        kit.servo[2].angle = 10
     elif (id ==0): #one finger
-        kit.servo[0].angle = 90
-        kit.servo[1].angle = 0
-        kit.servo[2].angle = 0    
+        kit.servo[0].angle = 80
+        kit.servo[1].angle = 10
+        kit.servo[2].angle = 10    
     return 0    
 
 def main():
