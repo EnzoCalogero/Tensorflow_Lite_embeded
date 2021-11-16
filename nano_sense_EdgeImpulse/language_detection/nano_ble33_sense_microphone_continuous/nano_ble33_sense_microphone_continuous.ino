@@ -19,6 +19,11 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
+#include <Wire.h>
+#include <Adafruit_PWMServoDriver.h>
+
+// called this way, it uses the default address 0x40
+Adafruit_PWMServoDriver pwm = Adafruit_PWMServoDriver();
 
 // If your target is limited in memory remove this macro to save 10K RAM
 #define EIDSP_QUANTIZE_FILTERBANK   0
@@ -31,9 +36,9 @@
 #define EI_CLASSIFIER_SLICES_PER_MODEL_WINDOW 3
 
 /* Includes ---------------------------------------------------------------- */
-
-#include <languages_inferencing.h>
 #include <PDM.h>
+#include <languages_inferencing.h>
+
 /** Audio buffers, pointers and selectors */
 typedef struct {
     signed short *buffers[2];
@@ -49,13 +54,70 @@ static signed short *sampleBuffer;
 static bool debug_nn = false; // Set this to true to see e.g. features generated from the raw signal
 static int print_results = -(EI_CLASSIFIER_SLICES_PER_MODEL_WINDOW);
 
+#define SERVOMIN  200 // This is the 'minimum' pulse length count (out of 4096)
+#define SERVOMAX  350//600 // This is the 'maximum' pulse length count (out of 4096)
+#define USMIN  600 // This is the rounded 'minimum' microsecond length based on the minimum pulse of 150
+#define USMAX  2400 // This is the rounded 'maximum' microsecond length based on the maximum pulse of 600
+#define SERVO_FREQ 50 // Analog servos run at ~50 Hz updates
+
+int iter;
+int period = 1000;
+unsigned long time_now = 0;
+unsigned long time_was = 0;
+
+unsigned long delta;
+void servos_selector(int iter){
+  
+  time_now = millis();
+  Serial.println(iter);
+  
+  Serial.println(time_now);
+  delta=time_now - time_was;
+  Serial.println(delta);
+  Serial.println("#################");
+  if (delta > 2000){
+    time_was=time_now;
+  switch (iter) {
+       case 0:
+            pwm.setPWM(0, 0, 350);
+            Serial.println("111");
+            delay(500);
+            pwm.setPWM(0, 0, 200);
+            pwm.setPWM(1, 0, 200);
+            pwm.setPWM(2, 0, 200);
+            break;
+      case 1:
+            pwm.setPWM(1, 0, 350);
+            Serial.println("2222");
+            delay(500);
+            pwm.setPWM(0, 0, 200);
+            pwm.setPWM(1, 0, 200);
+            pwm.setPWM(2, 0, 200);
+            break;
+      case 2:
+            pwm.setPWM(2, 0, 350);
+            Serial.println("333");
+            delay(500);
+            pwm.setPWM(0, 0, 200);
+            pwm.setPWM(1, 0, 200);
+            pwm.setPWM(2, 0, 200);
+            break;
+  }
+  }
+}
+
 /**
  * @brief      Arduino setup function
  */
 void setup()
 {
     // put your setup code here, to run once:
-    Serial.begin(115200);
+  Serial.begin(115200);
+
+  pwm.begin();
+  pwm.setOscillatorFrequency(27000000);
+  pwm.setPWMFreq(SERVO_FREQ);  // Analog servos run at ~50 Hz updates
+
 
     Serial.println("Edge Impulse Inferencing Demo");
 
@@ -106,12 +168,31 @@ void loop()
             ei_printf("    %s: %.5f\n", result.classification[ix].label,
                       result.classification[ix].value);
         }
+        //Serial.println(result.classification[0].value);
+        //Serial.println(result.classification[1].value);
+        //Serial.println(result.classification[2].value);
+        //Serial.println(result.classification[3].value);
+
+
+              
 #if EI_CLASSIFIER_HAS_ANOMALY == 1
         ei_printf("    anomaly score: %.3f\n", result.anomaly);
 #endif
 
         print_results = 0;
     }
+            if (result.classification[1].value > 0.80){
+              Serial.println("Que");
+              servos_selector(0);
+              }
+        else if (result.classification[2].value > 0.80){
+              Serial.println("SI");
+              servos_selector(1);
+              }     
+        else if (result.classification[3].value > 0.80){
+              Serial.println("Yes");
+              servos_selector(2);
+              }  
 }
 
 /**
